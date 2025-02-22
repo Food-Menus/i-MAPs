@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة افتتاحية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>مرحبًا بك في خدمة النقل</h1>
+    <form id="locationForm">
+        <label for="start">نقطة البداية:</label>
+        <input type="text" id="start" required>
+        <br>
+        <label for="end">نقطة النهاية:</label>
+        <input type="text" id="end" required>
+        <br>
+        <button type="submit">عرض الخريطة</button>
+    </form>
+    <script>
+        document.getElementById('locationForm').onsubmit = function(event) {
+            event.preventDefault();
+            const start = document.getElementById('start').value;
+            const end = document.getElementById('end').value;
+            localStorage.setItem('start', start);
+            localStorage.setItem('end', end);
+            window.location.href = 'map.html';
+        };
+    </script>
+</body>
+</html>

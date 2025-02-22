@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض الخريطة</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([30.0444, 31.2357], 7); // مركز افتراضي (القاهرة)
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        // استرجاع النقاط من التخزين المحلي
+        const start = localStorage.getItem('start');
+        const end = localStorage.getItem('end');
+
+        // إضافة نقاط البداية والنهاية
+        const startMarker = L.marker([30.0444, 31.2357]).addTo(map).bindPopup(start);
+        const endMarker = L.marker([25.1972, 55.2744]).addTo(map).bindPopup(end);
+
+        // عرض مسار بين النقطتين (مثال ثابت)
+        const latlngs = [
+            [30.0444, 31.2357], // نقطة البداية
+            [25.1972, 55.2744]  // نقطة النهاية
+        ];
+
+        const polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
+
+        // تكبير الخريطة لتناسب المسار
+        map.fitBounds(polyline.getBounds());
+
+        // تحديد موقع المستخدم
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                // إضافة موقع المستخدم على الخريطة
+                const userMarker = L.marker([userLat, userLng]).addTo(map).bindPopup('موقعك الحالي').openPopup();
+
+                // متابعة حركة المستخدم
+                map.setView([userLat, userLng], 13);
+
+                // تحديث موقع المستخدم كل 5 ثوانٍ
+                setInterval(() => {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        const newLat = position.coords.latitude;
+                        const newLng = position.coords.longitude;
+                        userMarker.setLatLng([newLat, newLng]);
+                    });
+                }, 5000);
+            }, () => {
+                alert('لم يتمكن المتصفح من تحديد موقعك.');
+            });
+        } else {
+            alert('Geolocation غير مدعوم في هذا المتصفح.');
+        }
+    </script>
+</body>
+</html>
